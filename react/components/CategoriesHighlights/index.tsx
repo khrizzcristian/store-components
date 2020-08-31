@@ -3,13 +3,13 @@ import React, { Component } from 'react'
 
 import categoriesHighlights from './categoriesHighlights.css'
 import CategoryCard from './components/CategoryCard'
-import { ITEMS_PER_ROW, RECTANGULAR, SQUARED } from './constants.js'
+import { ITEMS_PER_ROW, RECTANGULAR, SQUARED } from './constants'
 
 type OwnProps = {
   categoriesHighlighted?: any
   showCategoriesHighlighted?: boolean
   quantityOfItems: number
-  cardShape: any // TODO: PropTypes.oneOf([SQUARED, RECTANGULAR])
+  cardShape: 'squared' | 'rectangular'
 }
 
 type Props = OwnProps & typeof CategoriesHighlights.defaultProps
@@ -19,14 +19,14 @@ type Props = OwnProps & typeof CategoriesHighlights.defaultProps
  * Categories highlighted in a department.
  */
 class CategoriesHighlights extends Component<Props> {
-  static defaultProps = {
+  public static defaultProps = {
     categoriesHighlighted: {},
     showCategoriesHighlighted: false,
     quantityOfItems: ITEMS_PER_ROW,
     cardShape: SQUARED,
   }
 
-  static uiSchema = {
+  public static uiSchema = {
     categoriesHighlighted: {
       items: {
         image: {
@@ -36,11 +36,10 @@ class CategoriesHighlights extends Component<Props> {
     },
   }
 
-  static getSchema = ({ quantityOfItems }: any) => {
-    const categoriesHighlightedProps = {}
+  public static getSchema = ({ quantityOfItems = 0 }) => {
+    const categoriesHighlightedProps: Record<string, unknown> = {}
 
     range(0, quantityOfItems || ITEMS_PER_ROW).forEach(index => {
-      // @ts-expect-error ts-migrate(7053) FIXME: No index signature with a parameter of type 'strin... Remove this comment to see the full error message
       categoriesHighlightedProps[`category${index}`] = {
         type: 'object',
         title: 'admin/editor.categoriesHighlighted.category',
@@ -113,7 +112,7 @@ class CategoriesHighlights extends Component<Props> {
     }
   }
 
-  render() {
+  public render() {
     const {
       categoriesHighlighted,
       showCategoriesHighlighted,

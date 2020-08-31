@@ -1,15 +1,12 @@
 import React, { useContext, useCallback, useState, useEffect } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { path } from 'ramda'
-// @ts-expect-error ts-migrate(7016) FIXME: Try `npm install @types/react-content-loader` if i... Remove this comment to see the full error message
 import ContentLoader from 'react-content-loader'
 import { useRuntime } from 'vtex.render-runtime'
-// @ts-expect-error ts-migrate(2307) FIXME: Cannot find module 'vtex.store-resources/PWAContex... Remove this comment to see the full error message
 import { usePWA } from 'vtex.store-resources/PWAContext'
 import { useCssHandles } from 'vtex.css-handles'
 import useProduct from 'vtex.product-context/useProduct'
 import { useProductDispatch } from 'vtex.product-context/ProductDispatchContext'
-// @ts-expect-error ts-migrate(2305) FIXME: Module '"vtex.styleguide"' has no exported member ... Remove this comment to see the full error message
 import { Button, ToastContext, Tooltip } from 'vtex.styleguide'
 
 import useMarketingSessionParams from './hooks/useMarketingSessionParams'
@@ -69,7 +66,7 @@ const useCallCartFinishIfPending = (
   isAddingToCart: any,
   addToCartAndFinish: any
 ) => {
-  const orderFormLoading = orderFormContext && orderFormContext.loading
+  const orderFormLoading = orderFormContext?.loading
 
   useEffect(() => {
     if (!orderFormLoading && isAddingToCart) {
@@ -80,7 +77,7 @@ const useCallCartFinishIfPending = (
 }
 
 type Props = {
-  skuItems?: Array<{
+  skuItems: Array<{
     skuId: string
     quantity: number
     seller?: string | number
@@ -111,7 +108,7 @@ type Props = {
   orderFormContext?: any
   disabled?: boolean
   customToastURL?: string
-  checkoutUrl?: string
+  checkoutUrl: string
 }
 
 /**
@@ -148,18 +145,17 @@ export const BuyButton = ({
 
   const dispatch = useProductDispatch()
   const { settings = {}, showInstallPrompt } = usePWA() || {}
-  // @ts-expect-error ts-migrate(2339) FIXME: Property 'rootPath' does not exist on type 'Runtim... Remove this comment to see the full error message
   const { rootPath = '' } = useRuntime()
   const { promptOnCustomEvent } = settings
   const translateMessage = useCallback(id => intl.formatMessage({ id }), [intl])
-  const orderFormItems = path(['orderForm', 'items'], orderFormContext)
+  const orderFormItems = orderFormContext?.orderForm?.items
   const { utmParams, utmiParams } = useMarketingSessionParams()
 
   const resolveToastMessage = (success: any, isNewItem: any) => {
     if (!success) return translateMessage(CONSTANTS.ERROR_MESSAGE_ID)
     if (!isNewItem) return translateMessage(CONSTANTS.DUPLICATE_CART_ITEM_ID)
 
-    const isOffline = window && window.navigator && !window.navigator.onLine
+    const isOffline = window?.navigator && !window.navigator.onLine
     const checkForOffline = !isOffline
       ? translateMessage(CONSTANTS.SUCCESS_MESSAGE_ID)
       : translateMessage(CONSTANTS.OFFLINE_BUY_MESSAGE_ID)
@@ -187,21 +183,19 @@ export const BuyButton = ({
     event.preventDefault()
 
     setAddingToCart(true)
-    onAddStart && onAddStart()
+    onAddStart?.()
   }
 
   const addToCartAndFinish = async () => {
     let showToastMessage: any
 
     try {
-      // @ts-expect-error ts-migrate(2532) FIXME: Object is possibly 'undefined'.
       const minicartItems = skuItems.map(skuItemToMinicartItem)
       const localStateMutationResult = !isOneClickBuy
         ? await addToCart(minicartItems)
         : null
 
-      const linkStateItems =
-        localStateMutationResult && localStateMutationResult.data.addToCart
+      const linkStateItems = localStateMutationResult?.data.addToCart
 
       const callOrderFormDirectly = !linkStateItems
 
@@ -210,7 +204,6 @@ export const BuyButton = ({
       if (callOrderFormDirectly) {
         const variables = {
           orderFormId: orderFormContext.orderForm.orderFormId,
-          // @ts-expect-error ts-migrate(2532) FIXME: Object is possibly 'undefined'.
           items: skuItems.map(item => ({
             id: item.skuId,
             seller: item.seller,
@@ -224,7 +217,6 @@ export const BuyButton = ({
         const mutationRes = await orderFormContext.addItem({ variables })
         const { items } = mutationRes.data.addItem
 
-        // @ts-expect-error ts-migrate(2532) FIXME: Object is possibly 'undefined'.
         success = skuItems.filter(
           skuItem =>
             !!items.find(
@@ -237,7 +229,6 @@ export const BuyButton = ({
 
       const addedItem =
         (linkStateItems &&
-          // @ts-expect-error ts-migrate(2532) FIXME: Object is possibly 'undefined'.
           skuItems.filter(
             skuItem =>
               !!linkStateItems.find(
@@ -249,9 +240,7 @@ export const BuyButton = ({
 
       const foundItem =
         addedItem.length &&
-        orderFormItems &&
-        // @ts-expect-error ts-migrate(2571) FIXME: Object is of type 'unknown'.
-        orderFormItems.filter(
+        orderFormItems?.filter(
           (item: any) =>
             item.id === addedItem[0].skuId &&
             item.seller === addedItem[0].seller &&
